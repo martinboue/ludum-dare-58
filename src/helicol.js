@@ -3,14 +3,14 @@ import * as Matter from "matter-js";
 const { Bodies, Events, Body, Vector } = Matter;
 
 export default (engine) => {
-  const speed = 10;
+  const speed = 5;
   let velocity = Vector.create(0, 0);
-  const body = Bodies.rectangle(400, 500, 200, 60, {
+  const body = Bodies.rectangle(100, 45, 16, 16, {
     isStatic: false,
-    // chamfer: 10,
+    inertia: Infinity,
     render: {
       sprite: {
-        texture: "fish.png",
+        texture: "helico/helico-1.png",
       },
     },
   });
@@ -39,7 +39,7 @@ export default (engine) => {
       handle: () => {
         velocity.x -= speed;
       },
-    },
+    }
   };
 
   window.addEventListener("keydown", (e) => {
@@ -71,5 +71,5 @@ export default (engine) => {
     velocity = Vector.create(0, 0);
   });
 
-  return [body];
+  return body;
 };
