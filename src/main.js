@@ -1,15 +1,19 @@
-import * as Matter from 'matter-js';
+import * as Matter from "matter-js";
+import helicol from "./helicol";
 
-let Engine = Matter.Engine,
-  Render = Matter.Render,
-  Runner = Matter.Runner,
-  Body = Matter.Body,
-  Composite = Matter.Composite,
-  Composites = Matter.Composites,
-  Constraint = Matter.Constraint,
-  MouseConstraint = Matter.MouseConstraint,
-  Mouse = Matter.Mouse,
-  Bodies = Matter.Bodies;
+const {
+  Engine,
+  Render,
+  Runner,
+  Body,
+  Composite,
+  Composites,
+  Constraint,
+  MouseConstraint,
+  Mouse,
+  Bodies,
+} = Matter;
+
 // create engine
 let engine = Engine.create(),
   world = engine.world;
@@ -35,6 +39,8 @@ Render.run(render);
 let runner = Runner.create();
 Runner.run(runner, engine);
 
+const heliCol = helicol(engine);
+
 // add bodies
 let group = Body.nextGroup(true);
 
@@ -57,7 +63,8 @@ Composite.add(ropeA, Constraint.create({
 
 Composite.add(world, [
   ropeA,
-  Bodies.rectangle(400, 600, 1200, 50.5, { isStatic: true })
+  ...heliCol,
+  Bodies.rectangle(400, 600, 1200, 50.5, { isStatic: true }),
 ]);
 
 // add mouse control
@@ -67,9 +74,9 @@ let mouse = Mouse.create(render.canvas),
     constraint: {
       stiffness: 0.2,
       render: {
-        visible: false
-      }
-    }
+        visible: false,
+      },
+    },
   });
 
 Composite.add(world, mouseConstraint);
@@ -80,5 +87,5 @@ render.mouse = mouse;
 // fit the render viewport to the scene
 Render.lookAt(render, {
   min: { x: 0, y: 0 },
-  max: { x: 700, y: 600 }
+  max: { x: 700, y: 600 },
 });
