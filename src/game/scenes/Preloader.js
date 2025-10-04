@@ -34,11 +34,11 @@ export class Preloader extends Scene
 
         this.load.image('logo', 'logo.png');
 
-        this.load.image('helicol', 'helicol.png');
-
         this.load.image('chain-node', 'node.png');
 
         this.load.image('hook', 'hook.png');
+
+        this.load.aseprite('helico', 'helico/helico.png', 'helico/helico.json');
     }
 
     create ()
