@@ -23,7 +23,9 @@ let render = Render.create({
     height: 600,
     showAngleIndicator: true,
     showCollisions: true,
-    showVelocity: true
+    showVelocity: true,
+    // Debug :
+    wireframes: false
   }
 });
 
@@ -36,20 +38,21 @@ Runner.run(runner, engine);
 // add bodies
 let group = Body.nextGroup(true);
 
-let ropeA = Composites.stack(100, 50, 8, 1, 10, 10, function (x, y) {
-  return Bodies.rectangle(x, y, 50, 20, {
-    collisionFilter: { group: group }, render: {
-      sprite: { texture: "http://localhost:5173/fish.png" }
+let ropeA = Composites.stack(100, 50, 1, 12, 10, 10, function (x, y) {
+  return Bodies.rectangle(x, y, 16, 16, {
+    collisionFilter: { group: group }, 
+    render: {
+      sprite: { texture: "/chain-link.png" }
     }
   });
 });
 
-Composites.chain(ropeA, 0.5, 0, -0.5, 0, { stiffness: 0.8, length: 2, render: { type: 'line' } });
+Composites.chain(ropeA, 0, 0.5, 0, -0.5, { stiffness: 0.8, length: 2, render: { type: 'line' } });
 Composite.add(ropeA, Constraint.create({
   bodyB: ropeA.bodies[0],
-  pointB: { x: -25, y: 0 },
+  pointB: { x: 0, y: -8 },
   pointA: { x: ropeA.bodies[0].position.x, y: ropeA.bodies[0].position.y },
-  stiffness: 0.5
+  stiffness: 1
 }));
 
 Composite.add(world, [
