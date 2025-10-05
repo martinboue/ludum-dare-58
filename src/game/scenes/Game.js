@@ -97,10 +97,16 @@ export class Game extends Scene {
     }
     
     create() {
-        this.anims.createFromAseprite('helico');
+        // Show level map
+        const map = this.add.tilemap('level1');
+        const tileset = map.addTilesetImage('tiles');
+        const layer = map.createLayer(0, tileset, 0, 0);
         
-        this.cameras.main.setBackgroundColor(0x00ff00);
-        this.add.image(512, 384, 'background');
+        // Enable collisions for tiles in level
+        layer.setCollisionFromCollisionGroup();
+        this.matter.world.convertTilemapLayer(layer);
+
+        this.anims.createFromAseprite('helico');
 
         this.helicol = this.matter.add.sprite(100, 50, 'helico', null, {
             ignoreGravity: true,
@@ -136,20 +142,20 @@ export class Game extends Scene {
 
     update() {
         if (this.cursors.left.isDown) {
-            this.helicol.setVelocityX(-20);
+            this.helicol.setVelocityX(-5);
         }
         else if (this.cursors.right.isDown) {
-            this.helicol.setVelocityX(20);
+            this.helicol.setVelocityX(5);
         }
         else {
             this.helicol.setVelocityX(0);
         }
 
         if (this.cursors.up.isDown) {
-            this.helicol.setVelocityY(-20);
+            this.helicol.setVelocityY(-5);
         }
         else if (this.cursors.down.isDown) {
-            this.helicol.setVelocityY(20);
+            this.helicol.setVelocityY(5);
         }
         else {
             this.helicol.setVelocityY(0);

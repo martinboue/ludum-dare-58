@@ -5,12 +5,15 @@ import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
 import { AUTO, Game } from 'phaser';
 
+export const WOLRD_WIDTH = 640;
+export const WOLRD_HEIGHT = 400;
+
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: AUTO,
-    width: 256,
-    height: 256,
+    width: WOLRD_WIDTH,
+    height: WOLRD_HEIGHT,
     parent: 'game-container',
     backgroundColor: '#028af8',
     scale: {

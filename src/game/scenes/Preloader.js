@@ -39,6 +39,10 @@ export class Preloader extends Scene
         this.load.image('hook', 'hook.png');
 
         this.load.aseprite('helico', 'helico/helico.png', 'helico/helico.json');
+
+        // Levels
+        this.load.tilemapTiledJSON('level1', 'levels/level1.json');
+        this.load.image('tiles', 'levels/tilesheet.png');
     }
 
     create ()
