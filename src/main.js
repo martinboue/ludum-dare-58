@@ -1,15 +1,21 @@
-import * as Matter from 'matter-js';
+import * as Matter from "matter-js";
+import helicol from "./helicol";
+import heavyHook from "./hook";
 
-let Engine = Matter.Engine,
-  Render = Matter.Render,
-  Runner = Matter.Runner,
-  Body = Matter.Body,
-  Composite = Matter.Composite,
-  Composites = Matter.Composites,
-  Constraint = Matter.Constraint,
-  MouseConstraint = Matter.MouseConstraint,
-  Mouse = Matter.Mouse,
-  Bodies = Matter.Bodies;
+const {
+  Engine,
+  Render,
+  Runner,
+  Body,
+  Composite,
+  Composites,
+  Constraint,
+  MouseConstraint,
+  Mouse,
+  Detector,
+  Bodies,
+} = Matter;
+
 // create engine
 let engine = Engine.create();
 const world = engine.world;
@@ -19,11 +25,11 @@ let render = Render.create({
   element: document.body,
   engine: engine,
   options: {
-    width: 960,
-    height: 440,
+    width: 800,
+    height: 600,
     // Debug :
     wireframes: false,
-  }
+  },
 });
 
 Render.run(render);
@@ -32,60 +38,78 @@ Render.run(render);
 let runner = Runner.create();
 Runner.run(runner, engine);
 
-// add bodies
+const heliCol = helicol(engine);
+
 let group = Body.nextGroup(true);
 
-let ropeA = Composites.stack(100, 50, 1, 12, 10, 10, function (x, y) {
+let rope = Composites.stack(100, 50, 1, 5, 10, 10, (x, y) => {
   return Bodies.rectangle(x, y, 16, 16, {
-    collisionFilter: { group: group }, 
+    collisionFilter: { group: group },
     render: {
-      sprite: { texture: "/chain-link.png" }
-    }
+      sprite: { texture: "/chain-link.png" },
+    },
   });
 });
 
-Composites.chain(ropeA, 0, 0.5, 0, -0.5, { stiffness: 0.8, length: 2, render: { visible: false } });
-Composite.add(ropeA, Constraint.create({
-  bodyB: ropeA.bodies[0],
-  pointB: { x: 0, y: -8 },
-  pointA: { x: ropeA.bodies[0].position.x, y: ropeA.bodies[0].position.y },
-  stiffness: 1,
-  render: {
-    visible: false
-  }
-}));
+Composites.chain(rope, 0, 0.5, 0, -0.5, {
+  stiffness: 0.8,
+  length: 1,
+  render: { visible: false },
+});
+
+Composite.add(
+  rope,
+  Constraint.create({
+    bodyA: heliCol,
+    bodyB: rope.bodies[0],
+    pointB: { x: 0, y: 0 },
+    pointA: { x: 0, y: 0 },
+    stiffness: 1,
+    render: {
+      visible: false,
+    },
+  })
+);
+
+
+let boxesGroup = Body.nextGroup(true);
+
+const box = Bodies.rectangle(200, 100, 16, 16, {
+  collisionFilter: {group: boxesGroup},
+  render: { sprite: { texture: "box.png" } },
+});
+
+const hook = heavyHook(100, 50 + 16 * 6, group, "hook.png", [box]);
+
+Composite.add(
+  rope,
+  Constraint.create({
+    bodyA: hook,
+    bodyB: rope.bodies[rope.bodies.length - 1],
+    pointB: { x: 0, y: -4 },
+    pointA: { x: 0, y: 4 },
+    stiffness: 0.5,
+    render: {
+      visible: false,
+    },
+  })
+);
+
+Composite.add(rope, hook);
 
 Composite.add(world, [
-  ropeA,
-  // Top wall
-  Bodies.rectangle(render.options.width/2, 0, render.options.width, 50, { isStatic: true }),
-  // Bottom wall
-  Bodies.rectangle(render.options.width/2, render.options.height, render.options.width, 50, { isStatic: true }),
-  // Right wall
-  Bodies.rectangle(render.options.width, render.options.height/2, 50, render.options.height, { isStatic: true }),
-  // Left wall
-  Bodies.rectangle(0, render.options.height/2, 50, render.options.height, { isStatic: true })
+  heliCol,
+  rope,
+  box,
+  // walls
+  Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
+  Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
+  Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
+  Bodies.rectangle(0, 300, 50, 600, { isStatic: true }),
 ]);
-
-// add mouse control
-let mouse = Mouse.create(render.canvas),
-  mouseConstraint = MouseConstraint.create(engine, {
-    mouse: mouse,
-    constraint: {
-      stiffness: 0.2,
-      render: {
-        visible: false
-      }
-    }
-  });
-
-Composite.add(world, mouseConstraint);
-
-// keep the mouse in sync with rendering
-render.mouse = mouse;
 
 // fit the render viewport to the scene
 Render.lookAt(render, {
   min: { x: 0, y: 0 },
-  max: { x: render.options.width, y: render.options.height }
+  max: { x: 800, y: 600 },
 });
