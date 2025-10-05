@@ -1,164 +1,95 @@
-import { Scene } from 'phaser';
+import { Scene } from "phaser";
+import "../factories/HeliColFactory.js";
+import "../factories/CableFactory.js";
+import "../factories/HookFactory.js";
 
 export class Game extends Scene {
+  helicol;
 
-    helicol;
-    cursors;
+  constructor() {
+    super({
+      key: "Game",
+      physics: {
+        default: "matter",
+        matter: {
+          enabled: true,
+          positionIterations: 12,
+          velocityIterations: 8,
+          constraintIterations: 4,
+          enableSleeping: true,
+          debug: false,
+        },
+      },
+    });
+  }
 
-    constructor() {
-        super({
-            key: 'Game',
-            physics: {
-                default: "matter",
-                matter: {
-                    //    enabled: true,
-                    //    positionIterations: 6,
-                    //    velocityIterations: 4,
-                    //    constraintIterations: 2,
-                    //    enableSleeping: false,
-                    //    plugins: {
-                    //        attractors: false,
-                    //        wrap: false,
-                    //    },
-                    //    gravity: {
-                    //        x: 0,
-                    //        y: 0,
-                    //    }
-                    //    setBounds: {
-                    //        x: 0,
-                    //        y: 0,
-                    //        width: scene.sys.scale.width,
-                    //        height: scene.sys.scale.height,
-                    //        thickness: 64,
-                    //        left: true,
-                    //        right: true,
-                    //        top: true,
-                    //        bottom: true,
-                    //    },
-                    //    timing: {
-                    //        timestamp: 0,
-                    //        timeScale: 1,
-                    //    },
-                    //    correction: 1,
-                    //    getDelta: (function() { return 1000 / 60; }),
-                    //    autoUpdate: true,
-                    //    debug: false,
-                    //    debug: {
-                    //        showAxes: false,
-                    //        showAngleIndicator: false,
-                    //        angleColor: 0xe81153,
-                    //        showBroadphase: false,
-                    //        broadphaseColor: 0xffb400,
-                    //        showBounds: false,
-                    //        boundsColor: 0xffffff,
-                    //        showVelocity: false,
-                    //        velocityColor: 0x00aeef,
-                    //        showCollisions: false,
-                    //        collisionColor: 0xf5950c,
-                    //        showSeparations: false,
-                    //        separationColor: 0xffa500,
-                    //        showBody: true,
-                    //        showStaticBody: true,
-                    //        showInternalEdges: false,
-                    //        renderFill: false,
-                    //        renderLine: true,
-                    //        fillColor: 0x106909,
-                    //        fillOpacity: 1,
-                    //        lineColor: 0x28de19,
-                    //        lineOpacity: 1,
-                    //        lineThickness: 1,
-                    //        staticFillColor: 0x0d177b,
-                    //        staticLineColor: 0x1327e4,
-                    //        showSleeping: false,
-                    //        staticBodySleepOpacity: 0.7,
-                    //        sleepFillColor: 0x464646,
-                    //        sleepLineColor: 0x999a99,
-                    //        showSensors: true,
-                    //        sensorFillColor: 0x0d177b,
-                    //        sensorLineColor: 0x1327e4,
-                    //        showPositions: true,
-                    //        positionSize: 4,
-                    //        positionColor: 0xe042da,
-                    //        showJoint: true,
-                    //        jointColor: 0xe0e042,
-                    //        jointLineOpacity: 1,
-                    //        jointLineThickness: 2,
-                    //        pinSize: 4,
-                    //        pinColor: 0x42e0e0,
-                    //        springColor: 0xe042e0,
-                    //        anchorColor: 0xefefef,
-                    //        anchorSize: 4,
-                    //        showConvexHulls: false,
-                    //        hullColor: 0xd703d0
-                    //    }
-                }
-            }
-        });
-    }
-    
-    create() {
-        // Show level map
-        const map = this.add.tilemap('level1');
-        const tileset = map.addTilesetImage('tiles');
-        const layer = map.createLayer(0, tileset, 0, 0);
-        
-        // Enable collisions for tiles in level
-        layer.setCollisionFromCollisionGroup();
-        this.matter.world.convertTilemapLayer(layer);
+  create() {
+    this.add.image(512, 384, "background");
 
-        this.anims.createFromAseprite('helico');
+    // Show level map
+    const map = this.add.tilemap("level1");
+    const tileset = map.addTilesetImage("tiles");
+    const layer = map.createLayer(0, tileset, 0, 0);
 
-        this.helicol = this.matter.add.sprite(100, 50, 'helico', null, {
-            ignoreGravity: true,
-            scale: 10
-        }).play({ key: 'fly', repeat: -1, frameRate: 20 })
+    // Enable collisions for tiles in level
+    layer.setCollisionFromCollisionGroup();
+    this.matter.world.convertTilemapLayer(layer);
 
-        this.helicol.setFixedRotation();
-        this.helicol.setMass(500);
+    this.cameras.main.setBackgroundColor(0x00ff00);
 
-        // let y = 100;
-        // let prev = this.helicol;
+    const group = this.matter.world.nextGroup(true);
 
-        // const chain = this.matter.add.imageStack('chain-node', '__DEFAULT', x, y, columns, rows);
+    const playerX = 100;
+    const playerY = 50;
 
-        // for (let i = 0; i < 9; i++) {
-        //     const node = this.matter.add.image(300, y, 'chain-node', null, { shape: 'circle', mass: 0., scale: 4 });
+    const linkCount = 5;
+    const linkW = 16;
+    const linkH = 16;
+    const startX = 100;
+    const startY = 50;
+    const rowGap = 8;
+    const pairStiffness = 1;
+    const pairLength = 1;
 
-        //     this.matter.add.joint(prev, node, i == 0 ? 90 : 25, 0.4);
+    // GameObjects and bodies
 
-        //     prev = node;
+    this.helicol = this.add.helicol(playerX, playerY, group);
+    const [cableHead, cableTail] = this.add.cable(
+      playerX,
+      playerY,
+      linkCount,
+      linkH,
+      linkW,
+      rowGap,
+      pairStiffness,
+      pairLength,
+      group
+    );
 
-        //     y += 8;
-        // }
+    const hookX = playerX;
+    const hookY = playerY + linkH * (linkCount + 1);
+    const hookW = linkW;
+    const hookH = linkH;
 
-        // const hook = this.matter.add.image(300, y, 'hook', null, { shape: 'circle', mass: 0., scale: 4 });
+    const hook = this.add.hook(hookX, hookY, hookW, hookW);
 
-        // this.matter.add.joint(prev, hook,)
+    // Physic Constraints
 
-        this.matter.add.mouseSpring();
+    this.matter.add.constraint(this.helicol, cableHead, 1, 1, {
+      pointA: { x: 0, y: linkH },
+      pointB: { x: 0, y: 0 },
+    });
 
-        this.cursors = this.input.keyboard.createCursorKeys();
-    }
+    this.matter.add.constraint(cableTail, hook, 1, 1, {
+      pointA: { x: 0, y: linkH / 2 },
+      pointB: { x: 0, y: -linkH / 2 },
+    });
 
-    update() {
-        if (this.cursors.left.isDown) {
-            this.helicol.setVelocityX(-5);
-        }
-        else if (this.cursors.right.isDown) {
-            this.helicol.setVelocityX(5);
-        }
-        else {
-            this.helicol.setVelocityX(0);
-        }
+    this.matter.add.mouseSpring();
+  }
 
-        if (this.cursors.up.isDown) {
-            this.helicol.setVelocityY(-5);
-        }
-        else if (this.cursors.down.isDown) {
-            this.helicol.setVelocityY(5);
-        }
-        else {
-            this.helicol.setVelocityY(0);
-        }
-    }
+  update(time, delta) {
+    super.update(time, delta);
+    this.helicol.update(time, delta);
+  }
 }
