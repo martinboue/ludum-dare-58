@@ -75,15 +75,14 @@ Composite.add(
   })
 );
 
-
 let boxesGroup = Body.nextGroup(true);
 
 const box = Bodies.rectangle(200, 100, 16, 16, {
-  collisionFilter: {group: boxesGroup},
+  collisionFilter: { group: boxesGroup },
   render: { sprite: { texture: "box.png" } },
 });
 
-const hook = heavyHook(100, 50 + 16 * 6, group, "hook.png", [box]);
+const hook = heavyHook(engine, 100, 50 + 16 * 6, group, "hook.png", [box]);
 
 Composite.add(
   rope,
