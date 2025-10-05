@@ -14,7 +14,6 @@ export class HeliCol extends Physics.Matter.Sprite {
       },
     });
 
-    this.scene.anims.createFromAseprite("helico");
     this.play({ key: "fly", repeat: -1, frameRate: 20 });
     this.setFixedRotation();
     this.cursors = this.scene.input.keyboard.createCursorKeys();

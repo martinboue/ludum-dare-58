@@ -45,8 +45,6 @@ export class Game extends Scene {
     const linkCount = 5;
     const linkW = 16;
     const linkH = 16;
-    const startX = 100;
-    const startY = 50;
     const rowGap = 8;
     const pairStiffness = 1;
     const pairLength = 1;
