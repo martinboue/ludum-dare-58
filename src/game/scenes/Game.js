@@ -74,8 +74,8 @@ export class Game extends Scene {
     // Physic Constraints
 
     this.matter.add.constraint(this.helicol, cableHead, 1, 1, {
-      pointA: { x: 0, y: linkH },
-      pointB: { x: 0, y: 0 },
+      pointA: { x: 0, y: linkH/2 },
+      pointB: { x: 0, y: -linkH/2 },
     });
 
     this.matter.add.constraint(cableTail, hook, 1, 1, {
