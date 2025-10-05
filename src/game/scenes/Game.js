@@ -69,7 +69,7 @@ export class Game extends Scene {
     const hookW = linkW;
     const hookH = linkH;
 
-    const hook = this.add.hook(hookX, hookY, hookW, hookW);
+    const hook = this.add.hook(hookX, hookY, hookW, hookH);
 
     // Physic Constraints
 
@@ -82,6 +82,8 @@ export class Game extends Scene {
       pointA: { x: 0, y: linkH / 2 },
       pointB: { x: 0, y: -linkH / 2 },
     });
+
+    this.matter.add.sprite(200, 100, "box");
 
     this.matter.add.mouseSpring();
   }

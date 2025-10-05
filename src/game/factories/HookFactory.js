@@ -1,28 +1,14 @@
 import { GameObjects } from "phaser";
+import { Hook } from "../objects/Hook";
 
-GameObjects.GameObjectFactory.register("hook", function (x, y, w, h, group) {
-  const hook = this.scene.matter.add.image(x, y, "hook");
+GameObjects.GameObjectFactory.register(
+  "hook",
+  function (x, y, w, h, group) {
+    const obj = new Hook(this.scene.matter.world, x, y, w, h, group);
 
-  const shank = this.scene.matter.bodies.rectangle(x, y, w, h, {
-    collisionFilter: {
-      group,
-    },
-  });
+    this.scene.add.existing(obj);
 
-  const weight = this.scene.matter.bodies.circle(x, y + w / 2, w / 4, {
-    collisionFilter: {
-      group,
-    },
-  });
+    return obj;
+  }
+);
 
-  const hookBody = this.scene.matter.body.create({
-    parts: [shank, weight],
-    collisionFilter: {
-      group: group,
-    },
-  });
-
-  hook.setBody(hookBody);
-
-  return hook;
-});
